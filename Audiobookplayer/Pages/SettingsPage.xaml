@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:Audiobookplayer.ViewModels"
+             x:Class="Audiobookplayer.Pages.SettingsPage"
+             Title="Settings">
+    <ContentPage.BindingContext>
+        <viewmodels:SettingsViewModel />
+    </ContentPage.BindingContext>
+
+    <ContentView BackgroundColor="Black">
+        <ScrollView BackgroundColor="White"
+                    Margin="0, 1, 0, 0">
+            <VerticalStackLayout>
+                <Grid Padding="20, 20, 20, 0"
+                      RowSpacing="5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Label Text="Library Folder" 
+                       Grid.Row="0"
+                       FontSize="16"
+                       FontAttributes="Bold"
+                       VerticalOptions="Start"/>
+                    <Label Text="{Binding LibraryFolderDisplayPath}"
+                       FontAttributes="Italic"
+                       FontSize="15"
+                       LineBreakMode="MiddleTruncation"
+                       Grid.Row="1"
+                       VerticalOptions="End"
+                       TextColor="Grey"/>
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding FolderPickerCommand}">
+                        </TapGestureRecognizer>
+                    </Grid.GestureRecognizers>
+                </Grid>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </ContentView>
+</ContentPage>

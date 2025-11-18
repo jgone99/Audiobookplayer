@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:Audiobookplayer.ViewModels"
+             xmlns:models="clr-namespace:Audiobookplayer.Models"
+             x:Class="Audiobookplayer.Pages.LibraryPage"
+             Title="Library">
+    <ContentPage.BindingContext>
+        <viewmodels:AudiobookViewModel />
+    </ContentPage.BindingContext>
+    <ContentView BackgroundColor="Black">
+    <CollectionView x:DataType="viewmodels:AudiobookViewModel" 
+                    BackgroundColor="White"
+                    Margin="0, 1, 0, 0"
+                    ItemsSource="{Binding Audiobooks}"
+                    ItemsLayout="VerticalList"
+                    SelectionMode="Single"
+                    >
+        <CollectionView.EmptyView>
+            <StackLayout VerticalOptions="Center" HorizontalOptions="Center">
+                <Label Text="No audiobooks available" 
+                       FontSize="20" 
+                       FontAttributes="Bold" 
+                       HorizontalOptions="Center" />
+                <Label Text="Please add audiobooks to your library" 
+                       FontSize="16" 
+                       HorizontalOptions="Center" />
+            </StackLayout>
+        </CollectionView.EmptyView>
+        <CollectionView.ItemTemplate>
+            <DataTemplate  x:DataType="models:Audiobook">
+                <Grid Padding="10"
+                      ColumnSpacing="5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.RowSpan="3"
+                            StrokeShape="RoundRectangle 10, 10, 10, 10">
+                    <Image Source="{Binding CoverImage}"
+                           
+                           Aspect="AspectFill"
+                           HeightRequest="90"
+                           WidthRequest="90"/>
+                    </Border>
+                    <Label Text="{Binding Title}"
+                           Grid.Column="1"
+                           Grid.Row="0"
+                           FontSize="17"
+                           FontAttributes="Bold"
+                           LineBreakMode="WordWrap"
+                           VerticalOptions="Center"/>
+                    <Label Text="{Binding Author}"
+                           Grid.Row="1"
+                           Grid.Column="1"
+                           FontSize="16"
+                           FontAttributes="Italic"
+                           VerticalOptions="Center"/>
+                    <Label Text="{Binding Narrator}"
+                           Grid.Row="2"
+                           Grid.Column="1"
+                           FontSize="16"
+                           FontAttributes="Italic"
+                           VerticalOptions="Center"/>
+                </Grid>
+            </DataTemplate>
+        </CollectionView.ItemTemplate>
+    </CollectionView>
+    </ContentView>
+</ContentPage>
