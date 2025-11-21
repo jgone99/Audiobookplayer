@@ -5,14 +5,9 @@ using Audiobookplayer.Services;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
 
-#if ANDROID
-using Android.Provider;
-using Uri = Android.Net.Uri;
-#endif
-
 namespace Audiobookplayer.ViewModels
 {
-    public partial class AudiobookViewModel : ObservableObject
+    public partial class LibraryViewModel : ObservableObject
     {
         [ObservableProperty]
         private ObservableCollection<Audiobook> audiobooks = new();
@@ -27,10 +22,11 @@ namespace Audiobookplayer.ViewModels
         public ICommand SelectAudiobookCommand { private set; get; }
         public ICommand DeleteAudiobookCommand { private set; get; }
         public ICommand ToggleEditModeCommand { private set; get; }
+        public ICommand EditAudiobookCommand { private set; get; }
 
         private readonly PlayerService _playerService;
 
-        public AudiobookViewModel()
+        public LibraryViewModel()
         {
             _playerService = ((App)App.Current).Services.GetService<PlayerService>() ?? throw new InvalidOperationException("PlayerService not found");
             FileSystemServices.OnLibraryFolderChanged += OnLibraryFolderChanged;
@@ -38,6 +34,7 @@ namespace Audiobookplayer.ViewModels
             SelectAudiobookCommand = new AsyncRelayCommand<Audiobook>(SelectAudiobookAsync);
             DeleteAudiobookCommand = new AsyncRelayCommand<Audiobook>(DeleteAudiobook);
             ToggleEditModeCommand = new RelayCommand(ToggleEditMode);
+            EditAudiobookCommand = new AsyncRelayCommand<Audiobook>(EditAudiobook);
 
             LoadAudiobooksAsync();
         }
@@ -80,6 +77,9 @@ namespace Audiobookplayer.ViewModels
             if (audiobook == null)
                 return;
             await _playerService.SetBookAsync(audiobook);
+
+            await Task.Yield();
+            await Task.Delay(50);
             await Shell.Current.GoToAsync("//PlayerTab", true);
         }
 
@@ -91,11 +91,23 @@ namespace Audiobookplayer.ViewModels
             {
                 Audiobooks.Remove(audiobook);
             });
+
+            FileSystemServices.DeleteFile(audiobook.FilePath);
         }
 
         private void ToggleEditMode()
         {
             InEditMode = !InEditMode;
+        }
+
+        private async Task EditAudiobook(Audiobook audiobook)
+        {
+            if (audiobook == null)
+                return;
+            await Shell.Current.GoToAsync("EditPage", true, new Dictionary<string, object>
+            {
+                { "Audiobook", audiobook }
+            });
         }
     }
 }

@@ -8,7 +8,7 @@ namespace Audiobookplayer
         {
             InitializeComponent();
             Application.Current.UserAppTheme = AppTheme.Light;
-            Routing.RegisterRoute("player", typeof(PlayerPage));
+            Routing.RegisterRoute("EditPage", typeof(AudibookEditPage));
         }
     }
 }

@@ -11,17 +11,19 @@
             ContentTemplate="{DataTemplate local:LibraryPage}"
             Title="Library"
             Route="LibraryTab"
-            Icon="library.svg" />
+            Icon="library.png" />
 
         <ShellContent 
             ContentTemplate="{DataTemplate local:PlayerPage}" 
             Title="Player"
-            Route="PlayerTab"/>
+            Route="PlayerTab"
+            Icon="player.png"/>
         
         <ShellContent 
             ContentTemplate="{DataTemplate local:SettingsPage}"
             Title="Settings"
-            Route="SettingsTab"/>
+            Route="SettingsTab"
+            Icon="settings.png"/>
     </TabBar>
 
 </Shell>

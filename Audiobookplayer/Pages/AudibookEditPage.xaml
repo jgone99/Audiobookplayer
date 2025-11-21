@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:Audiobookplayer.ViewModels"
+             xmlns:models="clr-namespace:Audiobookplayer.Models"
+             x:Class="Audiobookplayer.Pages.AudibookEditPage"
+             Title="AudibookEditPage">
+    <ContentPage.BindingContext>
+        <viewmodels:AudiobookEditViewModel/>
+    </ContentPage.BindingContext>
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem
+            Text="Save"
+             />
+    </ContentPage.ToolbarItems>
+    
+    <Grid
+        Padding="20"
+        ColumnSpacing="10"
+        RowSpacing="10"
+        x:DataType="models:Audiobook"
+        BindingContext="{Binding Audiobook}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Label 
+            Text="Title:"
+            VerticalOptions="Center"
+            HorizontalOptions="Start"
+            Grid.Row="0"
+            Grid.Column="0"/>
+        <Label 
+            Text="Author:"
+            VerticalOptions="Center"
+            HorizontalOptions="Start"
+            Grid.Row="1"
+            Grid.Column="0"/>
+        <Label 
+            Text="Narrarator:"
+            VerticalOptions="Center"
+            HorizontalOptions="Start"
+            Grid.Row="2"
+            Grid.Column="0"/>
+        <Entry
+            Text="{Binding Title}"
+            VerticalOptions="Center"
+            HorizontalOptions="Fill"
+            Grid.Row="0"
+            Grid.Column="1"/>
+        <Entry
+            Text="{Binding Author}"
+            VerticalOptions="Center"
+            HorizontalOptions="Fill"
+            Grid.Row="1"
+            Grid.Column="1"/>
+        <Entry
+            Text="{Binding Narrator}"
+            VerticalOptions="Center"
+            HorizontalOptions="Fill"
+            Grid.Row="2"
+            Grid.Column="1"/>
+    </Grid>
+</ContentPage>

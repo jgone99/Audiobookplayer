@@ -56,5 +56,16 @@ namespace Audiobookplayer.Services
 #endif
             throw new NotImplementedException();
         }
+
+        public static void DeleteFile(string uriString)
+        {
+            if (string.IsNullOrEmpty(uriString))
+                return;
+#if ANDROID
+            Android.Net.Uri uri = Android.Net.Uri.Parse(uriString);
+            if (uri != null)
+                Platforms.Android.AndroidHelpers.DeleteFile(uri);
+#endif
+        }
     }
 }

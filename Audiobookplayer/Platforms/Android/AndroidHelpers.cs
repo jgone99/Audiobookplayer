@@ -163,6 +163,21 @@ namespace Audiobookplayer.Platforms.Android
             var uri = Uri.Parse(uriString);
             return resolver.OpenInputStream(uri);
         }
+
+        public static void DeleteFile(Uri uri)
+        {
+            var context = Application.Context;
+            var resolver = context.ContentResolver;
+
+            try
+            {
+                DocumentsContract.DeleteDocument(resolver, uri);
+            }
+            catch (Exception ex)
+            {
+                throw new System.IO.IOException("Failed to delete file", ex);
+            }
+        }
     }
 }
 
