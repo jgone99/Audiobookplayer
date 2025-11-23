@@ -1,35 +1,36 @@
 ﻿using Audiobookplayer.Models;
-using Plugin.Maui.Audio;
 
 namespace Audiobookplayer.Services
 {
     public class PlayerService
     {
-        private readonly IAudioManager _audioManager;
-        private IAudioPlayer? _audioPlayer;
+        private IAudioPlayer _player;
         public Audiobook? CurrentAudiobook { get; private set; }
         public event Action<Audiobook?>? OnAudiobookChanged;
 
-        public PlayerService(IAudioManager audioManager)
+        public PlayerService(IAudioPlayer player)
         {
-            _audioManager = audioManager;
+            _player = player;
         }
 
         public async Task SetBookAsync(Audiobook? audiobook)
         {
             OnAudiobookChanged?.Invoke(audiobook);
-            
-            CurrentAudiobook = audiobook;
-            _audioPlayer?.Dispose();
-            using Stream stream = FileSystemServices.OpenInputStream(audiobook.FilePath);
-            //_audioPlayer = (IAudioPlayer?)_audioManager.CreateAsyncPlayer(stream);
 
-            //_audioPlayer.Play();
+            CurrentAudiobook = audiobook;
+
+            using Stream stream = FileSystemServices.OpenInputStream(audiobook.FilePath);
+            await _player.LoadAsync(audiobook.FilePath);
         }
 
         public bool hasBook()
         {
             return CurrentAudiobook != null;
         }
+
+        public void Pause() => _player.Pause();
+        public void Play() => _player.Play();
+
+        public void SeekTo(long position) => _player.SeekTo(position);
     }
 }

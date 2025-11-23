@@ -4,67 +4,70 @@
              xmlns:viewmodels="clr-namespace:Audiobookplayer.ViewModels"
              xmlns:models="clr-namespace:Audiobookplayer.Models"
              x:Class="Audiobookplayer.Pages.AudibookEditPage"
-             Title="AudibookEditPage">
+             Title="Edit Metadata">
     <ContentPage.BindingContext>
-        <viewmodels:AudiobookEditViewModel/>
+        <viewmodels:MetadataOverrideViewModel/>
     </ContentPage.BindingContext>
 
     <ContentPage.ToolbarItems>
         <ToolbarItem
             Text="Save"
-             />
+            Command="{Binding SaveMetadataCommand}" />
     </ContentPage.ToolbarItems>
-    
-    <Grid
+    <VerticalStackLayout>
+        <Grid
         Padding="20"
         ColumnSpacing="10"
-        RowSpacing="10"
-        x:DataType="models:Audiobook"
-        BindingContext="{Binding Audiobook}">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-        <Label 
+        RowSpacing="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Label 
             Text="Title:"
             VerticalOptions="Center"
             HorizontalOptions="Start"
             Grid.Row="0"
             Grid.Column="0"/>
-        <Label 
+            <Label 
             Text="Author:"
             VerticalOptions="Center"
             HorizontalOptions="Start"
             Grid.Row="1"
             Grid.Column="0"/>
-        <Label 
+            <Label 
             Text="Narrarator:"
             VerticalOptions="Center"
             HorizontalOptions="Start"
             Grid.Row="2"
             Grid.Column="0"/>
-        <Entry
+            <Entry
             Text="{Binding Title}"
             VerticalOptions="Center"
             HorizontalOptions="Fill"
             Grid.Row="0"
             Grid.Column="1"/>
-        <Entry
+            <Entry
             Text="{Binding Author}"
             VerticalOptions="Center"
             HorizontalOptions="Fill"
             Grid.Row="1"
             Grid.Column="1"/>
-        <Entry
+            <Entry
             Text="{Binding Narrator}"
             VerticalOptions="Center"
             HorizontalOptions="Fill"
             Grid.Row="2"
             Grid.Column="1"/>
-    </Grid>
+        </Grid>
+        <Button
+            Text="Reset"
+            Margin="40"
+            Command="{Binding ResetMetadataCommand}"/>
+    </VerticalStackLayout>
 </ContentPage>

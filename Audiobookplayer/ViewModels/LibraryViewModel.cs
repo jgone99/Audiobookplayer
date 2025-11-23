@@ -24,7 +24,7 @@ namespace Audiobookplayer.ViewModels
         public ICommand ToggleEditModeCommand { private set; get; }
         public ICommand EditAudiobookCommand { private set; get; }
 
-        private readonly PlayerService _playerService;
+        private PlayerService _playerService;
 
         public LibraryViewModel()
         {
@@ -45,7 +45,6 @@ namespace Audiobookplayer.ViewModels
 
             libraryUriString = Preferences.Default.Get(libraryPrefKey, string.Empty);
 
-
             try
             {
                 if (string.IsNullOrEmpty(libraryUriString))
@@ -54,8 +53,18 @@ namespace Audiobookplayer.ViewModels
                 }
 
                 var loadedAudiobooks = await FileSystemServices.LoadAudiobooksFromUriAsync(libraryUriString);
+
+                loadedAudiobooks.Sort((book1, book2) => { return book1.Title.CompareTo(book2.Title); });
+
                 foreach (var audiobook in loadedAudiobooks)
                 {
+                    MetadataOverride overrides = MetadataOverrideService.GetOverrides(audiobook.FilePath);
+                    if (overrides != null)
+                    {
+                        audiobook.Title = overrides.Title;
+                        audiobook.Author = overrides.Author;
+                        audiobook.Narrator = overrides.Narrator;
+                    }
                     Audiobooks.Add(audiobook);
                 }
 
@@ -80,6 +89,7 @@ namespace Audiobookplayer.ViewModels
 
             await Task.Yield();
             await Task.Delay(50);
+
             await Shell.Current.GoToAsync("//PlayerTab", true);
         }
 
