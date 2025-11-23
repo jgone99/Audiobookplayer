@@ -1,4 +1,4 @@
-﻿#if ANDROID
+﻿
 using Android.App;
 using Android.Content;
 using Android.Media;
@@ -180,5 +180,3 @@ namespace Audiobookplayer.Platforms.Android
         }
     }
 }
-
-#endif

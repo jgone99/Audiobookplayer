@@ -1,4 +1,5 @@
-﻿using Audiobookplayer.Services;
+﻿using Audiobookplayer.ViewModels;
+using Audiobookplayer.Services;
 using CommunityToolkit.Maui;
 using Maui.FreakyEffects;
 
@@ -20,9 +21,11 @@ namespace Audiobookplayer
                 .ConfigureEffects(effects =>
                 {
                     effects.InitFreakyEffects();
-                })
-                .Services.AddSingleton<PlayerService>();
-            builder.Services.AddSingleton(Plugin.Maui.Audio.AudioManager.Current);
+                });
+#if ANDROID
+            builder.Services.AddSingleton<IAudioPlayer, Platforms.Android.ExoPlayerService>();
+#endif
+            builder.Services.AddSingleton<PlayerService>();
             return builder.Build();
         }
     }

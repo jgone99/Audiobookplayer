@@ -7,18 +7,39 @@
         <viewmodels:PlayerViewModel />
     </ContentPage.BindingContext>
     <Grid>
-        <Image Source="{Binding CoverImage}"
-                   Aspect="AspectFit"
-                   VerticalOptions="Center" 
-                   HorizontalOptions="Center"
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="3*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Image 
+            Grid.Row="1"
+            Source="{Binding CoverImage}"
+            Aspect="AspectFit"
+            VerticalOptions="Center" 
+            HorizontalOptions="Center"
                    />
-        <VerticalStackLayout>
+        <VerticalStackLayout
+            Grid.Row="0"
+            >
             <Label 
                 Text="{Binding BookTitle}"
                 FontAttributes="Bold"
                 FontSize="20"
                 VerticalOptions="Center" 
                 HorizontalOptions="Center" />
+        </VerticalStackLayout>
+        <VerticalStackLayout
+            Grid.Row="2"
+            VerticalOptions="Center"
+            >
+            <ImageButton
+                VerticalOptions="Center"
+                Source="{Binding PausePlayButtonIcon, TargetNullValue='pause.png'}"
+                Command="{Binding PausePlayCommand}"
+                Scale="1"
+                >
+            </ImageButton>
         </VerticalStackLayout>
     </Grid>
 

@@ -17,26 +17,28 @@
             Command="{Binding ToggleEditModeCommand}"/>
     </ContentPage.ToolbarItems>
     <ContentView BackgroundColor="Black">
-        <CollectionView x:DataType="viewmodels:LibraryViewModel" 
+        <Grid>
+            <CollectionView x:DataType="viewmodels:LibraryViewModel" 
                         BackgroundColor="White"
                         Margin="0, 1, 0, 0"
                         ItemsSource="{Binding Audiobooks}"
                         ItemsLayout="VerticalList">
-            <CollectionView.EmptyView>
-                <StackLayout VerticalOptions="Center" HorizontalOptions="Center">
-                    <Label Text="No audiobooks available" 
+                <CollectionView.EmptyView>
+                    <StackLayout VerticalOptions="Center" HorizontalOptions="Center">
+                        <Label Text="No audiobooks available" 
                            FontSize="20" 
                            FontAttributes="Bold" 
                            HorizontalOptions="Center" />
-                    <Label Text="Please add audiobooks to your library" 
+                        <Label Text="Please add audiobooks to your library" 
                            FontSize="16" 
                            HorizontalOptions="Center" />
-                </StackLayout>
-            </CollectionView.EmptyView>
-            <CollectionView.ItemTemplate>
-                <DataTemplate  x:DataType="models:Audiobook">
-                    <Grid>
-                        <Grid
+                    </StackLayout>
+                </CollectionView.EmptyView>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate  x:DataType="models:Audiobook">
+                        <Grid>
+                            <Grid
                             Padding="10"
                             ColumnSpacing="5"
                             Grid.RowSpan="3"
@@ -45,66 +47,66 @@
                             freakyEffects:TouchEffect.Color="AliceBlue"
                             freakyEffects:Commands.Tap="{Binding BindingContext.SelectAudiobookCommand, Source={RelativeSource AncestorType={x:Type ContentPage}}}"
                             freakyEffects:Commands.TapParameter="{Binding .}">
-                            <Grid.Triggers>
-                                <DataTrigger
+                                <Grid.Triggers>
+                                    <DataTrigger
                                     TargetType="Grid"
                                     Binding="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:LibraryViewModel}}, Path=InEditMode}"
                                     Value="True">
-                                    <Setter 
+                                        <Setter 
                                         Property="InputTransparent"
                                         Value="True"/>
-                                </DataTrigger>
-                            </Grid.Triggers>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <Grid.Behaviors>
-                                <toolkit:TouchBehavior
+                                    </DataTrigger>
+                                </Grid.Triggers>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.Behaviors>
+                                    <toolkit:TouchBehavior
                                 
                                     
                                     />
-                            </Grid.Behaviors>
-                             <Border Grid.RowSpan="3"
+                                </Grid.Behaviors>
+                                <Border Grid.RowSpan="3"
                                 StrokeShape="RoundRectangle 10, 10, 10, 10">
-                                <Image Source="{Binding CoverImage}"
+                                    <Image Source="{Binding CoverImage}"
                                Aspect="AspectFill"
                                HeightRequest="90"
                                WidthRequest="90"/>
-                            </Border>
-                            <Label Text="{Binding Title}"
+                                </Border>
+                                <Label Text="{Binding Title}"
                                Grid.Column="1"
                                Grid.Row="0"
                                FontSize="17"
                                FontAttributes="Bold"
                                LineBreakMode="WordWrap"
                                VerticalOptions="Center"/>
-                            <Label Text="{Binding Author}"
+                                <Label Text="{Binding Author}"
                                Grid.Row="1"
                                Grid.Column="1"
                                FontSize="16"
                                FontAttributes="Italic"
                                VerticalOptions="Center"/>
-                            <Label Text="{Binding Narrator}"
+                                <Label Text="{Binding Narrator}"
                                Grid.Row="2"
                                Grid.Column="1"
                                FontSize="16"
                                FontAttributes="Italic"
                                VerticalOptions="Center"/>
-                        </Grid>
+                            </Grid>
 
-                        <HorizontalStackLayout
+                            <HorizontalStackLayout
                             Spacing="-10"
                             Grid.Column="1"
                             Grid.Row="1"
                             VerticalOptions="Center"
                             HorizontalOptions="End">
-                            <ImageButton
+                                <ImageButton
                                 Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:LibraryViewModel}}, Path=EditAudiobookCommand}"
                                 CommandParameter="{Binding .}"
                                 Source="edit.png"
@@ -114,18 +116,18 @@
                                 HorizontalOptions="End"
                                 VerticalOptions="Center"
                                 IsVisible="False">
-                                <ImageButton.Triggers>
-                                    <DataTrigger
+                                    <ImageButton.Triggers>
+                                        <DataTrigger
                                     TargetType="ImageButton"
                                     Binding="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:LibraryViewModel}}, Path=InEditMode}"
                                     Value="True">
-                                        <Setter 
+                                            <Setter 
                                         Property="IsVisible"
                                         Value="True"/>
-                                    </DataTrigger>
-                                </ImageButton.Triggers>
-                            </ImageButton>
-                            <ImageButton
+                                        </DataTrigger>
+                                    </ImageButton.Triggers>
+                                </ImageButton>
+                                <ImageButton
                                 Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:LibraryViewModel}}, Path=DeleteAudiobookCommand}"
                                 CommandParameter="{Binding .}"
                                 Source="redtrash.png"
@@ -134,21 +136,22 @@
                                 HorizontalOptions="End"
                                 VerticalOptions="Center"
                                 IsVisible="False">
-                                <ImageButton.Triggers>
-                                    <DataTrigger
+                                    <ImageButton.Triggers>
+                                        <DataTrigger
                                     TargetType="ImageButton"
                                     Binding="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:LibraryViewModel}}, Path=InEditMode}"
                                     Value="True">
-                                        <Setter 
+                                            <Setter 
                                         Property="IsVisible"
                                         Value="True"/>
-                                    </DataTrigger>
-                                </ImageButton.Triggers>
-                            </ImageButton>
-                        </HorizontalStackLayout>
-                    </Grid>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+                                        </DataTrigger>
+                                    </ImageButton.Triggers>
+                                </ImageButton>
+                            </HorizontalStackLayout>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
     </ContentView>
 </ContentPage>
