@@ -24,5 +24,9 @@ It supports local audio files, background playback, bookmarks (WIP), progress sy
 ---
 
 ## 📷 Screenshots
-(Add your images here)
 
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/22d14691-90dd-4a8a-adba-3ec703602608" alt="Library" width="300" />
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="https://github.com/user-attachments/assets/3c3aa96c-e299-4ad7-a179-1da47a0d7b0f" alt="Player" width="300" />
+</div>
