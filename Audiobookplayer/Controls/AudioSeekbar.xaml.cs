@@ -1,19 +1,14 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using System.Windows.Input;
+
 namespace Audiobookplayer.Controls;
 
 public partial class AudioSeekbar : ContentView
 {
-	public AudioSeekbar()
+    public AudioSeekbar()
 	{
 		InitializeComponent();
-	}
-
-    public static readonly BindableProperty DurationProperty =
-    BindableProperty.Create(nameof(Duration), typeof(double), typeof(AudioSeekbar), 1.0);
-
-    public double Duration
-    {
-        get => (double)GetValue(DurationProperty);
-        set => SetValue(DurationProperty, value);
     }
 
     public static readonly BindableProperty PositionProperty =
@@ -25,18 +20,29 @@ public partial class AudioSeekbar : ContentView
         set => SetValue(PositionProperty, value);
     }
 
-    bool _isDragging;
+    public static readonly BindableProperty DragCompleteCommandProperty =
+    BindableProperty.Create(nameof(DragCompleteCommand), typeof(ICommand), typeof(AudioSeekbar));
 
-    public event EventHandler<double> SeekRequested;
-
-    private void OnDragStarted(object sender, EventArgs e)
+    public ICommand DragCompleteCommand
     {
-        _isDragging = true;
+        get => (ICommand)GetValue(DragCompleteCommandProperty);
+        set => SetValue(DragCompleteCommandProperty, value);
+    }
+    public static readonly BindableProperty DragStartCommandProperty =
+    BindableProperty.Create(nameof(DragStartCommand), typeof(ICommand), typeof(AudioSeekbar));
+
+    public ICommand DragStartCommand
+    {
+        get => (ICommand)GetValue(DragStartCommandProperty);
+        set => SetValue(DragStartCommandProperty, value);
     }
 
-    private void OnDragCompleted(object sender, EventArgs e)
+    public static readonly BindableProperty IsDraggingProperty =
+    BindableProperty.Create(nameof(IsDragging), typeof(bool), typeof(AudioSeekbar), false);
+
+    public bool IsDragging
     {
-        _isDragging = false;
-        SeekRequested?.Invoke(this, Position);
+        get => (bool)GetValue(IsDraggingProperty);
+        set => SetValue(IsDraggingProperty, value);
     }
 }

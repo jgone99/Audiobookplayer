@@ -17,15 +17,15 @@ namespace Audiobookplayer.Platforms.Android
         {
             base.OnCreate();
 
-            NotificationChannel channel = new NotificationChannel("AudiobookChannel", "PennSkanvTicChannel", NotificationImportance.Max);
-            channel.Description = "PennSkanvTic channel for foreground service notification";
+            NotificationChannel channel = new NotificationChannel("AudiobookPlayerChannel", "Bookmark", NotificationImportance.Default);
+            channel.Description = "Bookmark channel for foreground service notification";
 
             notificationManager = GetSystemService(Java.Lang.Class.FromType(typeof(NotificationManager))) as NotificationManager;
             notificationManager.CreateNotificationChannel(channel);
 
             Notification notification = new Notification.Builder(this, channel.Id)
-                .SetContentTitle("Audiobook Player")
-                .SetContentText("Playing audiobook")
+                .SetContentTitle("Playing...")
+                .SetContentText($"No audiobook selected")
                 .SetSmallIcon(Resource.Drawable.dotnet_bot)
                 .SetAutoCancel(false)
                 .SetOngoing(false)
@@ -33,7 +33,6 @@ namespace Audiobookplayer.Platforms.Android
             StartForeground(1, notification);
             _player = new ExoPlayerBuilder(Platform.AppContext).Build() ?? throw new InvalidOperationException("Failed to create ExoPlayer instance");
             _mediaSession = new MediaSession.Builder(Platform.AppContext, _player).Build() ?? throw new InvalidOperationException("Failed to create MediaSession instance");
-            _player.AddListener(new CustomPlayerListener());
         }
 
         public override void OnDestroy()

@@ -43,19 +43,72 @@
             Spacing="20"
             >
             <controls:AudioSeekbar
-                Duration="{Binding Duration}"
-                Position="{Binding Position}"
-                SeekRequested="{Binding OnSeekRequested, Source={x:Reference root}}"
+                Position="{Binding Position, Mode=TwoWay}"
+                DragCompleteCommand="{Binding DragCompleteCommand}"
+                DragStartCommand="{Binding DragStartCommand}"
                 />
-            <ImageButton
-                VerticalOptions="Center"
-                Source="{Binding PausePlayButtonIcon, TargetNullValue='pause.png'}"
-                Command="{Binding PausePlayCommand}"
-                Scale="1"
-                WidthRequest="40"
-                HeightRequest="40"
+            
+            <Grid
+                ColumnSpacing="10"
                 >
-            </ImageButton>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="2*" />
+                </Grid.ColumnDefinitions>
+                <ImageButton
+                    Grid.Column="0"
+                    VerticalOptions="Center"
+                    HorizontalOptions="End"
+                    Source="fastforward.png"
+                    Command="{Binding DoubleSpeedCommand}"
+                    Scale="0.6"
+                    WidthRequest="80"
+                    HeightRequest="40"
+                    CornerRadius="25"
+                    >
+                    <ImageButton.Triggers>
+                        <DataTrigger
+                            TargetType="ImageButton"
+                            Binding="{Binding IsDoubleSpeed}"
+                            Value="False">
+                            <Setter 
+                                Property="BackgroundColor"
+                                Value="White"/>
+                        </DataTrigger>
+                        <DataTrigger
+                            TargetType="ImageButton"
+                            Binding="{Binding IsDoubleSpeed}"
+                            Value="True">
+                            <Setter 
+                                Property="BackgroundColor"
+                                Value="LightGray"/>
+                        </DataTrigger>
+                    </ImageButton.Triggers>
+                </ImageButton>
+                <ImageButton
+                    Grid.Column="1"
+                    CornerRadius="50"
+                    Padding="10"
+                    VerticalOptions="Center"
+                    Source="{Binding PlayPauseIcon}"
+                    Scale="1"
+                    WidthRequest="60"
+                    HeightRequest="60"
+                    >
+                    
+                    <ImageButton.Behaviors>
+                        <toolkit:TouchBehavior
+                            Command="{Binding PausePlayCommand, Source={x:Reference PlayerVM}}"
+                            PressedBackgroundColor="LightGray"
+                            DefaultBackgroundColor="White"
+                            />
+                    </ImageButton.Behaviors>
+                </ImageButton>
+            </Grid>
         </VerticalStackLayout>
     </Grid>
 

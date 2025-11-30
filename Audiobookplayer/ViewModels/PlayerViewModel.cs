@@ -4,13 +4,16 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Windows.Input;
 using Microsoft.Maui.Controls.Shapes;
+using System.Diagnostics;
 
 namespace Audiobookplayer.ViewModels
 {
     public partial class PlayerViewModel : ObservableObject
     {
         private readonly PlayerService _playerService;
-        private bool _isPaused;
+        
+        [ObservableProperty]
+        private bool isPlaying = true;
 
         [ObservableProperty]
         private string pausePlayButtonIcon;
@@ -25,35 +28,60 @@ namespace Audiobookplayer.ViewModels
         private RectangleGeometry coverImageRect;
 
         [ObservableProperty]
-        private double duration;
+        private double position = 0.0;
 
         [ObservableProperty]
-        private double position;
+        private bool isDragging = false;
+
+        [ObservableProperty]
+        private bool isDoubleSpeed = false;
+
+        [ObservableProperty]
+        private string playPauseIcon = "pause.png";
 
         private Audiobook? currentBook;
 
+        private bool savedStateWasPlaying;
+        
+
         public ICommand PausePlayCommand { private set; get; }
-        public ICommand SeekToCommand { private set; get; }
+        public ICommand DragCompleteCommand { private set; get; }
+        public ICommand DragStartCommand { private set; get; }
+        public ICommand DoubleSpeedCommand { private set; get; }
+
+        IDispatcherTimer seekbarTrackingTimer = Dispatcher.GetForCurrentThread().CreateTimer();
 
         public PlayerViewModel()
         {
             _playerService = ((App)App.Current).Services.GetService<PlayerService>() ?? throw new InvalidOperationException("PlayerService not found");
             _playerService.OnAudiobookChanged += OnBookChanged;
+            _playerService.IsPlayingChanged += OnPlayingChanged;
 
             PausePlayCommand = new AsyncRelayCommand(PausePlayToggle);
-            SeekToCommand = new RelayCommand<double>(SeekTo);
+            DragCompleteCommand = new RelayCommand(OnDragComplete);
+            DragStartCommand = new RelayCommand(OnDragStart);
+            DoubleSpeedCommand = new AsyncRelayCommand(DoubleSpeedToggle);
 
             currentBook = _playerService.CurrentAudiobook;
             BookTitle = currentBook?.Title ?? "No book loaded";
             CoverImage = currentBook?.CoverImage;
             LoadAudiobookAsync();
-            SetPlay();
+            SetToPlay();
 
-            Dispatcher.GetForCurrentThread().StartTimer(TimeSpan.FromMilliseconds(250), () =>
-            {
-                Position = _playerService.GetCurrentPosition();
-                return true;
-            });
+            seekbarTrackingTimer.Interval = TimeSpan.FromMilliseconds(250);
+            seekbarTrackingTimer.Tick += UpdateSeekbarPosition;
+            seekbarTrackingTimer.IsRepeating = true;
+
+            seekbarTrackingTimer.Start();
+        }
+
+        private void UpdateSeekbarPosition(object? sender, EventArgs? args)
+        {
+            var pos = _playerService.GetCurrentPosition();
+            var dur = _playerService.GetDuration();
+            Debug.WriteLine($"pos = {pos / currentBook.Duration.TotalMilliseconds} \nPosition = {Position}");
+            Position = _playerService.GetCurrentPosition() / currentBook.Duration.TotalMilliseconds;
+            
         }
 
         private async void OnBookChanged(Audiobook? book)
@@ -65,52 +93,85 @@ namespace Audiobookplayer.ViewModels
             LoadAudiobookAsync();    
         }
 
+        private async void OnPlayingChanged(bool isPlaying)
+        {
+            IsPlaying = isPlaying;
+            if (IsPlaying)
+            {
+                PlayPauseIcon = "pause.png";
+                seekbarTrackingTimer.Start();
+            } 
+            else
+            {
+                PlayPauseIcon = "play.png";
+                seekbarTrackingTimer.Stop();
+            }
+        }
+
         private void LoadAudiobookAsync()
         {
             if (currentBook == null)
             {
-                Duration = 0;
-                Position = 0;
                 return;
             }
-            Console.WriteLine("Loading audio");
+            Debug.WriteLine("Loading audio");
             _playerService.LoadAudio(currentBook.FilePath);
         }
 
         private async Task PausePlayToggle()
         {
-            if (_isPaused)
+            if (IsPlaying)
             {
-                SetPlay();
+                SetToPause();
             }
             else
             {
-                SetPause();
+                SetToPlay();
             }
         }
 
-        private void SetPlay()
+        private async Task DoubleSpeedToggle()
         {
-            _isPaused = false;
-            PausePlayButtonIcon = "pause.png";
+            if (IsDoubleSpeed)
+                _playerService.SetPlaybackSpeed(1.0f);
+            else
+                _playerService.SetPlaybackSpeed(2.0f);
+            IsDoubleSpeed = !IsDoubleSpeed;
+        }
+
+        private void SetToPlay()
+        {
             _playerService.Play();
         }
 
-        private void SetPause()
+        private void SetToPause()
         {
-            _isPaused = true;
-            PausePlayButtonIcon = "play.png";
             _playerService.Pause();
         }
 
         private void ResetView()
         {
-            SetPlay();
+            SetToPlay();
         }
 
         private void SeekTo(double position)
         {
-            _playerService.SeekTo((long)position);
+            var dur = _playerService.GetDuration();
+            long pos = (long)(position * currentBook.Duration.TotalMilliseconds);
+            _playerService.SeekTo(pos);
+        }
+        public void OnDragComplete()
+        {
+            SeekTo(Position);
+            if (savedStateWasPlaying)
+                SetToPlay();
+        }
+
+        public void OnDragStart()
+        {
+            savedStateWasPlaying = IsPlaying;
+            if (IsPlaying)
+                SetToPause();
         }
     }
 }

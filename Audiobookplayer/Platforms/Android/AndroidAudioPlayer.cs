@@ -1,15 +1,10 @@
 ﻿
 using Audiobookplayer.Services;
 using Android.Content;
-using Android.App;
-using Android.Net;
 using AndroidX.Media3.Common;
-using AndroidX.Media3.ExoPlayer;
-using Application = Android.App.Application;
 using Uri = Android.Net.Uri;
 using AndroidX.Media3.Session;
 using Google.Common.Util.Concurrent;
-using Java.Lang.Reflect;
 using Bumptech.Glide.Util;
 
 namespace Audiobookplayer.Platforms.Android
@@ -21,8 +16,10 @@ namespace Audiobookplayer.Platforms.Android
         
         public long Duration => _controller.Duration;
         public long CurrentPosition => _controller.CurrentPosition;
+        public bool IsPlaying => _controller.IsPlaying;
 
         public event EventHandler PlaybackStateChanged;
+        public event Action<bool>? IsPlayingChanged;
 
         public AndroidAudioPlayer()
         {
@@ -36,7 +33,12 @@ namespace Audiobookplayer.Platforms.Android
                 _controllerFuture.AddListener(new Java.Lang.Runnable(() =>
                 {
                     _controller = (MediaController)_controllerFuture.Get();
+                    CustomPlayerListener listener = new();
+                    listener.IsPlayingChanged += (isPlaying) => IsPlayingChanged.Invoke(isPlaying);
+                    (_controller as IPlayer).AddListener(listener);
+                    _controller.SetPlaybackSpeed(1.0f);
                 }), Executors.MainThreadExecutor());
+
             }
             catch (Exception ex)
             {
@@ -57,6 +59,6 @@ namespace Audiobookplayer.Platforms.Android
 
         public void SeekTo(long position) => _controller.SeekTo(position);
 
-
+        public void SetPlaybackSpeed(float speed) => _controller.SetPlaybackSpeed(speed);
     }
 }

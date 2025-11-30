@@ -4,6 +4,7 @@ namespace Audiobookplayer.Platforms.Android
 {
     public class CustomPlayerListener : Java.Lang.Object, IPlayerListener
     {
+        public event Action<bool>? IsPlayingChanged;
         public void OnMediaMetadataChanged(MediaMetadata? mediaMetadata)
         {
             string title = mediaMetadata?.Title?.ToString() ?? string.Empty;
@@ -14,6 +15,7 @@ namespace Audiobookplayer.Platforms.Android
 
         public void OnIsPlayingChanged(bool isPlaying)
         {
+            IsPlayingChanged.Invoke(isPlaying);
             System.Diagnostics.Debug.WriteLine($"Playback state changed: {isPlaying}");
         }
 
