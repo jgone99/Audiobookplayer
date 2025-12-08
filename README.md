@@ -11,14 +11,14 @@ It supports local audio files, background playback, bookmarks (WIP), progress sy
 - 🔊 **Background playback** with media controls   
 - 📚 **Library management** with cover art and metadata  
 - 🔄 **Adjustable playback speed**  
-- 🔔 **Lockscreen + notification controls (Android)**  
+- 🔔 **Lockscreen + notification controls (Android)**
+- ⏱️ **Smart resume** — automatically remembers where you left off
+- 🔔 **Lockscreen + notification controls (Android)**
 
 ## 🚀 Planned Features
 
 - 📍 **Unlimited bookmarks** per audiobook  
-- ⏱️ **Smart resume** — automatically remembers where you left off  
 - 🔄 **Adjustable playback speed**  
-- 🔔 **Lockscreen + notification controls (Android)**
 - 🤖 **AI-powered Speech To Text Transcription**
 
 ---
