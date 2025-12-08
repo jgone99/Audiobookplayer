@@ -14,6 +14,9 @@ namespace Audiobookplayer.Services
 
         void SetPlaybackSpeed(float speed);
 
+        int GetPlaybackState();
+
         event EventHandler PlaybackStateChanged;
+        public event Action? IsReady;
     }
 }

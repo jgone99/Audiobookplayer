@@ -48,6 +48,8 @@ namespace Audiobookplayer.ViewModels
 
         private PlaybackProgress? progress;
 
+        private bool pendingPlayerReady = true;
+
         public ICommand PausePlayCommand { private set; get; }
         public ICommand DragCompleteCommand { private set; get; }
         public ICommand DragStartCommand { private set; get; }
@@ -62,6 +64,7 @@ namespace Audiobookplayer.ViewModels
             _playerService = ((App)App.Current).Services.GetService<PlayerService>() ?? throw new InvalidOperationException("PlayerService not found");
             _playerService.OnAudiobookChanged += OnBookChanged;
             _playerService.IsPlayingChanged += OnPlayingChanged;
+            _playerService.IsReady += OnInitialReady;
             InitPlayer();
         }
 
@@ -83,14 +86,12 @@ namespace Audiobookplayer.ViewModels
             if (BookSelected)
             {
                 OnBookChanged(_playerService.CurrentAudiobook);
-                SetToPlay();
-                seekbarTrackingTimer.Start();
             }
         }
 
         private void UpdateSeekbarPosition(object? sender = null, EventArgs? args = null)
         {
-            Debug.WriteLine($"Position = {Position}");
+            Debug.WriteLine($"Position = {Position}, State = {_playerService.GetPlaybackState()}");
             Position = (double)_playerService.GetCurrentPosition();
             progress.Position = Position;
             PlaybackProgressService.Save(currentBook.Id, progress);
@@ -98,7 +99,8 @@ namespace Audiobookplayer.ViewModels
 
         private async void OnBookChanged(Audiobook? book)
         {
-            BookSelected = true;
+            SetToPause();
+            pendingPlayerReady = true;
             currentBook = book;
             
             progress = PlaybackProgressService.GetProgress(currentBook.Id) ?? new PlaybackProgress();
@@ -108,8 +110,7 @@ namespace Audiobookplayer.ViewModels
             Duration = book.Duration.TotalMilliseconds;
             Position = progress?.Position ?? 0.0;
             ResetView();
-            LoadAudiobookToPlayerAsync();
-            SeekTo(Position);
+            LoadAudiobookToPlayer();
         }
 
         private async void OnPlayingChanged(bool isPlaying)
@@ -127,7 +128,18 @@ namespace Audiobookplayer.ViewModels
             }
         }
 
-        private void LoadAudiobookToPlayerAsync()
+        private async void OnInitialReady()
+        {
+            if (pendingPlayerReady)
+            {
+                pendingPlayerReady = false;
+                SeekTo(Position);
+                SetToPlay();
+                seekbarTrackingTimer.Start();
+            }
+        }
+
+        private void LoadAudiobookToPlayer()
         {
             if (currentBook == null)
             {
@@ -176,7 +188,6 @@ namespace Audiobookplayer.ViewModels
         private void ResetView()
         {
             SetDoubleSpeed(false);
-            SetToPlay();
         }
 
         private void SeekTo(double newPosition)

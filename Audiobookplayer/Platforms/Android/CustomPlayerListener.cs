@@ -1,10 +1,13 @@
-﻿using AndroidX.Media3.Common;
+﻿
+using AndroidX.Media3.Common;
+using AndroidX.Media3.ExoPlayer;
 
 namespace Audiobookplayer.Platforms.Android
 {
     public class CustomPlayerListener : Java.Lang.Object, IPlayerListener
     {
         public event Action<bool>? IsPlayingChanged;
+        public event Action? IsReady;
         public void OnMediaMetadataChanged(MediaMetadata? mediaMetadata)
         {
             string title = mediaMetadata?.Title?.ToString() ?? string.Empty;
@@ -17,6 +20,14 @@ namespace Audiobookplayer.Platforms.Android
         {
             IsPlayingChanged.Invoke(isPlaying);
             System.Diagnostics.Debug.WriteLine($"Playback state changed: {isPlaying}");
+        }
+
+        public void OnPlaybackStateChanged(int state)
+        {
+            switch (state)
+            {
+                case 3: IsReady.Invoke() ; break;
+            }
         }
 
         // This is the key: Process the metadata when it is available

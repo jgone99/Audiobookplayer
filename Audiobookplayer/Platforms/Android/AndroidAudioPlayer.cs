@@ -20,6 +20,7 @@ namespace Audiobookplayer.Platforms.Android
 
         public event EventHandler PlaybackStateChanged;
         public event Action<bool>? IsPlayingChanged;
+        public event Action? IsReady;
 
         public AndroidAudioPlayer()
         {
@@ -35,6 +36,7 @@ namespace Audiobookplayer.Platforms.Android
                     _controller = (MediaController)_controllerFuture.Get();
                     CustomPlayerListener listener = new();
                     listener.IsPlayingChanged += (isPlaying) => IsPlayingChanged.Invoke(isPlaying);
+                    listener.IsReady += () => IsReady.Invoke();
                     (_controller as IPlayer).AddListener(listener);
                     _controller.SetPlaybackSpeed(1.0f);
                 }), Executors.MainThreadExecutor());
@@ -60,5 +62,10 @@ namespace Audiobookplayer.Platforms.Android
         public void SeekTo(long position) => _controller.SeekTo(position);
 
         public void SetPlaybackSpeed(float speed) => _controller.SetPlaybackSpeed(speed);
+
+        public int GetPlaybackState()
+        {
+            return _controller.PlaybackState;
+        }
     }
 }
