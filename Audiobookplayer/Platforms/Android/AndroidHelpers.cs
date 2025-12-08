@@ -98,6 +98,7 @@ namespace Audiobookplayer.Platforms.Android
 
                         if (name.EndsWith(".m4b", StringComparison.OrdinalIgnoreCase))
                         {
+                            
                             var retriever = new MediaMetadataRetriever();
                             retriever.SetDataSource(context, fileUri);
 

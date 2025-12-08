@@ -25,19 +25,20 @@ public partial class MetadataOverrideViewModel : ObservableObject, IQueryAttribu
 
     private async Task SaveMetadata()
 	{
-        MetadataOverrideService.SaveOverrides(audiobook.FilePath, new MetadataOverride
+        MetadataOverrideService.SaveOverrides(audiobook.Id, new MetadataOverride
         {
             Title = Title,
             Author = Author,
             Narrator = Narrator
         });
-        
+        FileSystemServices.NotifyLibraryFolderChanged();
         await Shell.Current.GoToAsync("..");
 	}
 
     private async Task ResetMetadata()
     {
         MetadataOverrideService.DeleteOverrides(audiobook.FilePath);
+        FileSystemServices.NotifyLibraryFolderChanged();
         await Shell.Current.GoToAsync("..");
     }
 

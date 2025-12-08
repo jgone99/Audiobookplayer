@@ -28,10 +28,10 @@ namespace Audiobookplayer.ViewModels
         private RectangleGeometry coverImageRect;
 
         [ObservableProperty]
-        private double position = 0.0;
+        private double position;
 
         [ObservableProperty]
-        private bool isDragging = false;
+        private double duration;
 
         [ObservableProperty]
         private bool isDoubleSpeed = false;
@@ -39,15 +39,21 @@ namespace Audiobookplayer.ViewModels
         [ObservableProperty]
         private string playPauseIcon = "pause.png";
 
+        [ObservableProperty]
+        private bool bookSelected = false;
+
         private Audiobook? currentBook;
 
         private bool savedStateWasPlaying;
-        
+
+        private PlaybackProgress? progress;
 
         public ICommand PausePlayCommand { private set; get; }
         public ICommand DragCompleteCommand { private set; get; }
         public ICommand DragStartCommand { private set; get; }
         public ICommand DoubleSpeedCommand { private set; get; }
+        public ICommand SkipForwardCommand { private set; get; }
+        public ICommand SkipBackwardCommand { private set; get; }
 
         IDispatcherTimer seekbarTrackingTimer = Dispatcher.GetForCurrentThread().CreateTimer();
 
@@ -56,41 +62,54 @@ namespace Audiobookplayer.ViewModels
             _playerService = ((App)App.Current).Services.GetService<PlayerService>() ?? throw new InvalidOperationException("PlayerService not found");
             _playerService.OnAudiobookChanged += OnBookChanged;
             _playerService.IsPlayingChanged += OnPlayingChanged;
+            InitPlayer();
+        }
 
+        private void InitPlayer()
+        {
             PausePlayCommand = new AsyncRelayCommand(PausePlayToggle);
             DragCompleteCommand = new RelayCommand(OnDragComplete);
             DragStartCommand = new RelayCommand(OnDragStart);
             DoubleSpeedCommand = new AsyncRelayCommand(DoubleSpeedToggle);
-
-            currentBook = _playerService.CurrentAudiobook;
-            BookTitle = currentBook?.Title ?? "No book loaded";
-            CoverImage = currentBook?.CoverImage;
-            LoadAudiobookAsync();
-            SetToPlay();
+            SkipBackwardCommand = new AsyncRelayCommand(SkipBackward);
+            SkipForwardCommand = new AsyncRelayCommand(SkipForward);
 
             seekbarTrackingTimer.Interval = TimeSpan.FromMilliseconds(250);
             seekbarTrackingTimer.Tick += UpdateSeekbarPosition;
             seekbarTrackingTimer.IsRepeating = true;
 
-            seekbarTrackingTimer.Start();
+            BookSelected = _playerService.CurrentAudiobook != null;
+
+            if (BookSelected)
+            {
+                OnBookChanged(_playerService.CurrentAudiobook);
+                SetToPlay();
+                seekbarTrackingTimer.Start();
+            }
         }
 
-        private void UpdateSeekbarPosition(object? sender, EventArgs? args)
+        private void UpdateSeekbarPosition(object? sender = null, EventArgs? args = null)
         {
-            var pos = _playerService.GetCurrentPosition();
-            var dur = _playerService.GetDuration();
-            Debug.WriteLine($"pos = {pos / currentBook.Duration.TotalMilliseconds} \nPosition = {Position}");
-            Position = _playerService.GetCurrentPosition() / currentBook.Duration.TotalMilliseconds;
-            
+            Debug.WriteLine($"Position = {Position}");
+            Position = (double)_playerService.GetCurrentPosition();
+            progress.Position = Position;
+            PlaybackProgressService.Save(currentBook.Id, progress);
         }
 
         private async void OnBookChanged(Audiobook? book)
         {
-            ResetView();
+            BookSelected = true;
             currentBook = book;
+            
+            progress = PlaybackProgressService.GetProgress(currentBook.Id) ?? new PlaybackProgress();
+            
             BookTitle = book?.Title ?? "No book loaded";
             CoverImage = book?.CoverImage;
-            LoadAudiobookAsync();    
+            Duration = book.Duration.TotalMilliseconds;
+            Position = progress?.Position ?? 0.0;
+            ResetView();
+            LoadAudiobookToPlayerAsync();
+            SeekTo(Position);
         }
 
         private async void OnPlayingChanged(bool isPlaying)
@@ -108,7 +127,7 @@ namespace Audiobookplayer.ViewModels
             }
         }
 
-        private void LoadAudiobookAsync()
+        private void LoadAudiobookToPlayerAsync()
         {
             if (currentBook == null)
             {
@@ -133,10 +152,15 @@ namespace Audiobookplayer.ViewModels
         private async Task DoubleSpeedToggle()
         {
             if (IsDoubleSpeed)
-                _playerService.SetPlaybackSpeed(1.0f);
+                SetDoubleSpeed(false);
             else
-                _playerService.SetPlaybackSpeed(2.0f);
-            IsDoubleSpeed = !IsDoubleSpeed;
+                SetDoubleSpeed(true);
+        }
+
+        private void SetDoubleSpeed(bool b)
+        {
+            IsDoubleSpeed = b;
+            _playerService.SetPlaybackSpeed(b ? 2.0f : 1.0f);
         }
 
         private void SetToPlay()
@@ -151,14 +175,13 @@ namespace Audiobookplayer.ViewModels
 
         private void ResetView()
         {
+            SetDoubleSpeed(false);
             SetToPlay();
         }
 
-        private void SeekTo(double position)
+        private void SeekTo(double newPosition)
         {
-            var dur = _playerService.GetDuration();
-            long pos = (long)(position * currentBook.Duration.TotalMilliseconds);
-            _playerService.SeekTo(pos);
+            _playerService.SeekTo((long)newPosition);
         }
         public void OnDragComplete()
         {
@@ -172,6 +195,29 @@ namespace Audiobookplayer.ViewModels
             savedStateWasPlaying = IsPlaying;
             if (IsPlaying)
                 SetToPause();
+        }
+
+        private void SkipTo(double newPosition)
+        {
+            newPosition = Math.Max(newPosition, 0);
+            newPosition = Math.Min(newPosition, Duration);
+            savedStateWasPlaying = IsPlaying;
+            if (IsPlaying)
+                SetToPause();
+            SeekTo(newPosition);
+            UpdateSeekbarPosition();
+            if (savedStateWasPlaying)
+                SetToPlay();
+        }
+
+        public async Task SkipForward()
+        {
+            SkipTo(Position + 10000);
+        }
+
+        public async Task SkipBackward()
+        {
+            SkipTo(Position - 10000);
         }
     }
 }

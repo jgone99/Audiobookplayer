@@ -1,20 +1,43 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:Audiobookplayer.Converters"
              x:Class="Audiobookplayer.Controls.AudioSeekbar"
              x:Name="root">
-    <Slider x:Name="SliderControl"
-            Minimum="0"     
-            Maximum="1.0"
-            Value="{Binding Position, Mode=TwoWay, Source={x:Reference root}}"
-            DragCompletedCommand="{Binding DragCompleteCommand, Source={x:Reference root}}"
-            DragStartedCommand="{Binding DragStartCommand, Source={x:Reference root}}"
-            ThumbColor="BlueViolet"
-            MaximumTrackColor="Gray"
-            MinimumTrackColor="Black"
-            HeightRequest="10"
-            VerticalOptions="Fill"
-            HorizontalOptions="Fill"
+    <ContentView.Resources>
+        <converters:MillisecondsToTimeSpanConverter x:Key="TimeConverter" />
+    </ContentView.Resources>
+    <Grid
+        RowSpacing="2"
+        >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Label
+            Grid.Row="1"
+            HorizontalOptions="Start"
+            Text="{Binding Position, Source={x:Reference root}, Converter={StaticResource TimeConverter}}" />
+        <Slider x:Name="SliderControl"
+                Margin="-15, 0, -15, 0"
+                Grid.Row="0"
+                Minimum="0"     
+                Maximum="{Binding Duration, Source={x:Reference root}}"
+                Value="{Binding Position, Mode=TwoWay, Source={x:Reference root}}"
+                DragCompletedCommand="{Binding DragCompleteCommand, Source={x:Reference root}}"
+                DragStartedCommand="{Binding DragStartCommand, Source={x:Reference root}}"
+                ThumbColor="BlueViolet"
+                MaximumTrackColor="Gray"
+                MinimumTrackColor="Black"
+                HeightRequest="10"
+                VerticalOptions="Fill"
+                HorizontalOptions="Fill"
             >
-    </Slider>
+        </Slider>
+        <Label
+            Grid.Row="1"
+            HorizontalOptions="End"
+            Text="{Binding Duration, Source={x:Reference root}, Converter={StaticResource TimeConverter}}" />
+    </Grid>
+
 </ContentView>

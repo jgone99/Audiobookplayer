@@ -58,7 +58,9 @@ namespace Audiobookplayer.ViewModels
 
                 foreach (var audiobook in loadedAudiobooks)
                 {
-                    MetadataOverride overrides = MetadataOverrideService.GetOverrides(audiobook.FilePath);
+                    audiobook.Id = GenerateAudiobookId(audiobook.FilePath);
+
+                    MetadataOverride overrides = MetadataOverrideService.GetOverrides(audiobook.Id);
                     if (overrides != null)
                     {
                         audiobook.Title = overrides.Title;
@@ -118,6 +120,19 @@ namespace Audiobookplayer.ViewModels
             {
                 { "Audiobook", audiobook }
             });
+        }
+
+        private static string GenerateAudiobookId(string filepath)
+        {
+            using Stream stream = FileSystemServices.OpenInputStream(filepath);
+            using System.Security.Cryptography.SHA256 sha256 = System.Security.Cryptography.SHA256.Create();
+
+            var buff = new byte[10 * 1024 * 1024];
+
+            int bytesRead = stream.Read(buff, 0, buff.Length);
+
+            byte[] hash = sha256.ComputeHash(buff, 0, bytesRead);
+            return Convert.ToHexString(hash);
         }
     }
 }
